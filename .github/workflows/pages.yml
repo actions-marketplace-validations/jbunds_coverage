@@ -51,7 +51,7 @@ jobs:
   generate-and-upload:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.0
 
       - name: Go coverage report
         uses: ./  # './' refers to the action.yml file in the root of this repo; external callers should use "jbunds/coverage@v1"
