@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "devDependencies": {
-    "eslint": "^9.39.4",
+    "eslint": "^10.6.0",
     "neostandard": "^0.13.0"
   }
 }
