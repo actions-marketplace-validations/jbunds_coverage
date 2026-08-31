@@ -16,10 +16,6 @@ branding:
   color: blue
 
 inputs:
-  go-version:
-    description: 'Go version to use'
-    required:    false
-    default:     '1.26.1'
   go-mod:
     description: 'path to the root go.mod file'
     required:    false
@@ -35,7 +31,7 @@ inputs:
 
 outputs:
   all:           # accessed downstream via ${{ fromJson(steps.coverage_report.outputs.all).report-pathname }} for example
-    description: JSON string containing all outputs from gwatts/go-coverage-action
+    description: JSON string containing all outputs published by gwatts/go-coverage-action
     value:       ${{ toJson(steps.coverage_profile.outputs) }}
 
 runs:
@@ -43,10 +39,10 @@ runs:
   steps:
     - name: setup-go
       id:   setup_go
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
-        cache:      false    # workaround https://github.com/actions/setup-go/issues/722
-        go-version: ${{ inputs.go-version }}
+        cache:           false # workaround https://github.com/actions/setup-go/issues/722
+        go-version-file: ${{ inputs.go-mod }}
 
     - name: coverage profile
       id:   coverage_profile

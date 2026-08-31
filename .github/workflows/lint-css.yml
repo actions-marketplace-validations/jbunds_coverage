@@ -1,6 +1,7 @@
-name: CSS stylelint
+name: CSS Lint (Biome)
 
 on:
+  workflow_dispatch: # allows this workflow to be manually triggered from the UI
   push:
     branches: [ 'main' ]
     paths:
@@ -9,18 +10,14 @@ on:
     branches: [ 'main' ]
     paths:
       - '**/*.css'
-  workflow_dispatch: # allows this workflow to be manually triggered from the UI
 
 permissions: # https://docs.github.com/actions/reference/workflows-and-actions/workflow-syntax#permissions
   contents: read
 
 jobs:
-  stylelint:
-    runs-on: macos-latest # https://docs.github.com/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for--private-repositories
-    env:
-      NPM_CONFIG_LOGLEVEL: verbose
+  biome:
+    runs-on: ubuntu-latest # https://docs.github.com/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for--private-repositories
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup-node
-      - run:  npm ci
-      - run:  npx stylelint '**/*.css' --formatter verbose
+      - uses: actions/checkout@v7
+      - uses: biomejs/setup-biome@v2
+      - run:  biome ci --verbose .

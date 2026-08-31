@@ -18,16 +18,16 @@ permissions:      # https://docs.github.com/actions/reference/workflows-and-acti
 
 jobs:
   test:
-    runs-on: macos-latest # https://docs.github.com/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for--private-repositories
+    runs-on: ubuntu-latest # https://docs.github.com/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for--private-repositories
     steps:
 
-    - uses: actions/checkout@v6 # http://github.com/actions/checkout
+    - uses: actions/checkout@v7 # http://github.com/actions/checkout
       with:
         fetch-depth: 10         # https://github.com/gwatts/go-coverage-action#example-workflow
 
-    - uses: actions/setup-go@v6 # http://github.com/actions/setup-go
+    - uses: actions/setup-go@v7 # http://github.com/actions/setup-go
       with:
-        go-version: '1.26.1'    # https://github.com/marketplace/actions/setup-go-environment#supported-version-syntax
+        go-version-file: go.mod # https://github.com/marketplace/actions/setup-go-environment#supported-version-syntax
 
     - name: test                # https://pkg.go.dev/cmd/go#hdr-Testing_functions
       id:   test
@@ -40,7 +40,7 @@ jobs:
         coverage-threshold: 50 # https://github.com/gwatts/go-coverage-action#usage
 
     - name: update coverage badge # https://github.com/schneegans/dynamic-badges-action#%EF%B8%8F-configuration
-      uses: schneegans/dynamic-badges-action@v1.8.0
+      uses: schneegans/dynamic-badges-action@v1.9.0
       with:
         auth:     ${{ secrets.GIST_SECRET }}
         gistID:   5a36403860174baeee62844ab96a77d9

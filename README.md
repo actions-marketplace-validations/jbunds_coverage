@@ -1,4 +1,9 @@
-[![Go Version](https://img.shields.io/badge/go-%20v1.26.1-blue?logo=go)](https://github.com/jbunds/coverage/blob/main/go.mod) &nbsp; [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit) &nbsp; [![tests](https://github.com/jbunds/coverage/actions/workflows/test-go.yml/badge.svg)](https://github.com/jbunds/coverage/actions/workflows/test-go.yml) &nbsp; [![coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/jbunds/5a36403860174baeee62844ab96a77d9/raw/coverage.json)](https://github.com/jbunds/coverage/actions/workflows/test-go.yml) &nbsp; [![lint](https://github.com/jbunds/coverage/actions/workflows/lint-go.yml/badge.svg)](https://github.com/jbunds/coverage/actions/workflows/lint-go.yml) &nbsp; [![ESLint | neostandard](https://img.shields.io/badge/ESLint-neostandard-brightgreen?style=flat)](https://github.com/neostandard/neostandard)
+[![Go Version](https://img.shields.io/badge/go-%20v1.26.2-blue?logo=go)](https://github.com/jbunds/coverage/blob/main/go.mod) &nbsp;
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit) &nbsp;
+[![tests](https://github.com/jbunds/coverage/actions/workflows/test-go.yml/badge.svg)](https://github.com/jbunds/coverage/actions/workflows/test-go.yml) &nbsp;
+[![coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/jbunds/5a36403860174baeee62844ab96a77d9/raw/coverage.json)](https://github.com/jbunds/coverage/actions/workflows/test-go.yml) &nbsp;
+[![lint](https://github.com/jbunds/coverage/actions/workflows/lint-go.yml/badge.svg)](https://github.com/jbunds/coverage/actions/workflows/lint-go.yml) &nbsp;
+[![Linted with Biome](https://img.shields.io/badge/Linted_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 
 [simple-tree]:          https://github.com/psnet/simple-tree
 [k8s]:                  https://github.com/kubernetes/kubernetes
@@ -64,7 +69,7 @@ $ go run github.com/jbunds/coverage
 coverage usage:
 
   -coverprofile string
-    	path to Go test coverage profile file
+    	path to the Go test coverage profile file
   -gomod string
     	path to the root go.mod file
   -path string
@@ -79,41 +84,47 @@ Aside from the [CLI interface](#cli-usage) outlined above, there are two ways to
 
 1. The [`jbunds/coverage@v1`][action] reusable [GitHub Action][actions] generates the test coverage report and writes the files comprising the report to `coverage-report-path`. For example:
 
-```
-- uses: jbunds/coverage@v1
-  with:
-    go-version:           '1.26.1'           # optional; default is '1.26.1'
-    go-mod:               'go.mod'           # optional; default is 'go.mod'
-    coverage-threshold:   '50'               # optional; default is '0'
-    coverage-report-path: 'coverage_report'  # optional; default is 'coverage_report'
-```
+   ```
+   - uses: jbunds/coverage@v1
+     with:
+       go-mod:               'go.mod'           # optional; default is 'go.mod'
+       coverage-threshold:   '50'               # optional; default is '0'
+       coverage-report-path: 'coverage_report'  # optional; default is 'coverage_report'
+   ```
 
-The [`go-version`][action], [`go-mod`][action], [`coverage-threshold`][gwatts-gocov-outputs], and [`coverage-report-path`][workflow] parameters are optional.
+The [`go-mod`][action], [`coverage-threshold`][gwatts-gocov-outputs], and [`coverage-report-path`][workflow] parameters are optional.
 
 All [outputs][gwatts-gocov-outputs] produced by the [`gwatts/go-coverage-action`][gwatts-gocov-action] workflow step are available downstream via JSON decoding, e.g.:
 
-```
-${{ fromJson(steps.coverage_report.outputs.all).gcov-pathname    }}
-${{ fromJson(steps.coverage_report.outputs.all).report-pathname  }}
-${{ fromJson(steps.coverage_report.outputs.all).coverage-pct     }}
-${{ fromJson(steps.coverage_report.outputs.all).coverage-pct-1dp }}
-${{ fromJson(steps.coverage_report.outputs.all).meets-threshold  }}
-```
+   ```
+   ${{ fromJson(steps.coverage_report.outputs.all).gcov-pathname    }}
+   ${{ fromJson(steps.coverage_report.outputs.all).report-pathname  }}
+   ${{ fromJson(steps.coverage_report.outputs.all).coverage-pct     }}
+   ${{ fromJson(steps.coverage_report.outputs.all).coverage-pct-1dp }}
+   ${{ fromJson(steps.coverage_report.outputs.all).meets-threshold  }}
+   ```
 
-etc...
+etc.
+
+See [`jbunds/progress/.github/workflows/test-go.yml`](https://github.com/jbunds/progress/blob/main/.github/workflows/test-go.yml) for a working example.
 
 2. The [`jbunds/coverage/.github/workflows/pages.yml@v1`][workflow] reusable [GitHub Workflow][workflows] generates the test coverage report and also deploys it to [GitHub Pages][pages]. For example:
 
-```
-- uses: jbunds/coverage/.github/workflows/pages.yml@v1
-  with:
-    go-version:           '1.26.1'           # optional: default is '1.26.1'
-    go-mod:               'go.mod'           # optional; default is 'go.mod'
-    coverage-threshold:   '50'               # optional; default is '0'
-    coverage-report-path: 'coverage_report'  # optional; default is 'coverage_report'
-```
+   ```
+   - uses: jbunds/coverage/.github/workflows/pages.yml@v1
+     permissions:
+       contents: write  # required by gwatts/go-coverage-action to execute `git push origin refs/notes/gocoverage`
+       pages:    write  # required by actions/deploy-pages
+       id-token: write  # required by actions/deploy-pages
+     with:
+       go-mod:               'go.mod'           # optional; default is 'go.mod'
+       coverage-threshold:   '50'               # optional; default is '0'
+       coverage-report-path: 'coverage_report'  # optional; default is 'coverage_report'
+   ```
 
-See https://jbunds.github.io/coverage/ for an example, which is not particularly interesting since it consists of just the four Go source files which implement the module.
+See [`jbunds/progress/.github/workflows/pages.yml`](https://github.com/jbunds/progress/blob/main/.github/workflows/pages.yml) for a working example.
+
+See [jbunds.github.io/coverage/](https://jbunds.github.io/coverage/) or [jbunds.github.io/progress/](https://jbunds.github.io/progress/) for example HTML reports uploaded to Pages.
 
 The well-known and relatively large (500k+ LoC) [Kubernetes][k8s] project was chosen for the demo to better illustrate the features and performance.
 
@@ -122,5 +133,7 @@ The well-known and relatively large (500k+ LoC) [Kubernetes][k8s] project was ch
 #### But _Why?_
 
 The motivation for the `coverage` module was to create a relatively minimal alternative to the default HTML interface produced by `go tool cover -html <coverage profile filename> -o <html filename>`, with a simple and intuitive UI, and with minimal JavaScript (55 lines total as of this writing, to implement the functionality of the toggle buttons).
+
+##### Prior Art
 
 The CSS code was inspired by and adapted from [github.com/psnet/simple-tree][simple-tree], and it clearly still needs to be polished. But I am definitely _not_ a CSS expert, and it fulfills the required behavior as-is.

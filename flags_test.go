@@ -18,7 +18,6 @@ func TestUsage(t *testing.T) {
 		wantCoverProfile string
 		wantPath         string
 		wantOut          string
-		stdErr           string
 		err              string // zero value means no error expected (err113)
 	}{
 		{
@@ -39,7 +38,7 @@ func TestUsage(t *testing.T) {
 				"missing -gomod usage:",
 				"",
 				"  -coverprofile string",
-				"    	path to Go test coverage profile file",
+				"    	path to the Go test coverage profile file",
 				"  -gomod string",
 				"    	path to the root go.mod file",
 				"  -path string",
@@ -54,7 +53,7 @@ func TestUsage(t *testing.T) {
 				"missing -coverprofile usage:",
 				"",
 				"  -coverprofile string",
-				"    	path to Go test coverage profile file",
+				"    	path to the Go test coverage profile file",
 				"  -gomod string",
 				"    	path to the root go.mod file",
 				"  -path string",
@@ -72,7 +71,7 @@ func TestUsage(t *testing.T) {
 				"missing -path usage:",
 				"",
 				"  -coverprofile string",
-				"    	path to Go test coverage profile file",
+				"    	path to the Go test coverage profile file",
 				"  -gomod string",
 				"    	path to the root go.mod file",
 				"  -path string",
@@ -91,7 +90,7 @@ func TestUsage(t *testing.T) {
 			wantGoMod:        "foo",
 			wantCoverProfile: "bar",
 			wantPath:         "baz",
-			stdErr:           "ignored arguments: bug, boo\n",
+			wantOut:          "ignored arguments: bug, boo\n",
 		},
 		{
 			name:    "invalid",
@@ -101,7 +100,7 @@ func TestUsage(t *testing.T) {
 				"invalid usage:",
 				"",
 				"  -coverprofile string",
-				"    	path to Go test coverage profile file",
+				"    	path to the Go test coverage profile file",
 				"  -gomod string",
 				"    	path to the root go.mod file",
 				"  -path string",
@@ -114,12 +113,11 @@ func TestUsage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			gotOut := new(bytes.Buffer)
-			gotErr := new(bytes.Buffer)
 			fs     := flag.NewFlagSet(tt.name, flag.ContinueOnError)
 			fs.SetOutput(gotOut)
 			var err error
 			var gotGoMod, gotCoverProfile, gotPath string
-			gotGoMod, gotCoverProfile, gotPath, err = flags(fs, tt.args, gotErr)
+			gotGoMod, gotCoverProfile, gotPath, err = flags(fs, tt.args)
 			if tt.err != "" {
 				if err == nil {
 					t.Errorf("flags(%q) did not fail", tt.name)
@@ -127,9 +125,6 @@ func TestUsage(t *testing.T) {
 				if tt.err != err.Error() {
 					t.Errorf("flags(%q) returned %q; expected %q\n", tt.name, err, tt.err)
 				}
-			}
-			if diff := cmp.Diff(tt.stdErr, gotErr.String()); diff != "" {
-				t.Errorf("flags(%q) stderr mismatch (-want +got):\n%s", tt.name, diff)
 			}
 			if diff := cmp.Diff(tt.wantOut, gotOut.String()); diff != "" {
 				t.Errorf("flags(%q) usage message mismatch (-want +got):\n%s", tt.name, diff)

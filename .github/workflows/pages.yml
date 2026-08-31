@@ -7,7 +7,7 @@
 #      per these standard actions:
 #
 #        - actions/configure-pages@v6
-#        - actions/upload-pages-artifact@v4
+#        - actions/upload-pages-artifact@v5
 #
 #   3. deploys the Go test coverage HTML report to GitHub Pages
 #      via actions/deploy-pages@v5
@@ -18,11 +18,6 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
-      go-version:
-        type:        string
-        description: 'Go version'
-        required:    false
-        default:     '1.26.1'
       go-mod:
         type:        string
         description: 'path to the root go.mod file'
@@ -43,7 +38,7 @@ on:
     paths:
       - '**/*.go'
 
-concurrency:          # avoid races
+concurrency: # avoid races
   group:              'pages'
   cancel-in-progress: false
 
@@ -51,18 +46,18 @@ jobs:
   generate-and-upload:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Go coverage report
-        uses: ./  # './' refers to the action.yml file in the root of this repo; external callers should use "jbunds/coverage@v1"
+        uses: "jbunds/coverage@v1"
         with:
-          go-version:           ${{ inputs.go-version           || '1.26.1'          }}
+          go-version-file:      ${{ inputs.go-mod               || 'go.mod'          }}
           go-mod:               ${{ inputs.go-mod               || 'go.mod'          }}
           coverage-threshold:   ${{ inputs.coverage-threshold   || '0'               }}
           coverage-report-path: ${{ inputs.coverage-report-path || 'coverage_report' }}
 
-      - name: upload to GitHub Pages          # https://jbunds.github.io/coverage/
-        uses: ./.github/actions/upload-pages  # external callers should use "jbunds/coverage/.github/actions/upload-pages@v1"
+      - name: upload to GitHub Pages # https://jbunds.github.io/coverage/
+        uses: "jbunds/coverage/.github/actions/upload-pages@v1"
         with:
           coverage-report-path: ${{ inputs.coverage-report-path || 'coverage_report' }}
 
@@ -70,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:   generate-and-upload
     permissions: # required permissions for the GITHUB_TOKEN to deploy to GitHub Pages
-      contents: read
+      contents: write # required for callers (!!!) to execute `git push origin refs/notes/gocoverage`; https://docs.github.com/actions/reference/workflows-and-actions/reusing-workflow-configurations#access-and-permissions-for-nested-workflows
       pages:    write
       id-token: write
     environment:
