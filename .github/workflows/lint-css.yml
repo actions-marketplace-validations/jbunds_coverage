@@ -18,6 +18,6 @@ jobs:
   biome:
     runs-on: ubuntu-latest # https://docs.github.com/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for--private-repositories
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - uses: biomejs/setup-biome@v2
       - run:  biome ci --verbose .
